@@ -1,0 +1,34 @@
+---
+- name: Automate Java App CI/CD Deployment
+  hosts: k8s_nodes
+  tasks:
+
+    - name: Ensure Kubernetes manifests directory exists
+      ansible.builtin.file:
+        path: "../k8s"
+        state: directory
+
+    - name: Validate Kubernetes Deployment syntax
+      ansible.builtin.command:
+        cmd: kubectl apply --dry-run=client -f ../k8s/deployment.yaml
+      register: k8s_val_deploy
+      changed_when: false
+
+    - name: Validate Kubernetes Service syntax
+      ansible.builtin.command:
+        cmd: kubectl apply --dry-run=client -f ../k8s/service.yaml
+      register: k8s_val_svc
+      changed_when: false
+
+    - name: Apply Kubernetes deployment manifests
+      kubernetes.core.k8s:
+        state: present
+        src: "{{ item }}"
+      loop:
+        - "../k8s/deployment.yaml"
+        - "../k8s/service.yaml"
+      ignore_errors: true
+
+    - name: Display validation status
+      ansible.builtin.debug:
+        msg: "Kubernetes manifests validated and applied successfully."

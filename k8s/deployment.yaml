@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-app-deployment
+  labels:
+    app: java-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: java-app
+  template:
+    metadata:
+      labels:
+        app: java-app
+    spec:
+      containers:
+      - name: java-app-container
+        image: 4dh11/ci-cd-java-app:latest  # Replace with your Docker Hub image
+        imagePullPolicy: Always
+        command: ["/bin/sh", "-c", "java -jar app.jar && sleep infinity"]
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
