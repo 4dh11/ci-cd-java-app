@@ -52,8 +52,8 @@ jobs:
           ${{ secrets.DOCKERHUB_USERNAME }}/ci-cd-java-app:latest
           ${{ secrets.DOCKERHUB_USERNAME }}/ci-cd-java-app:${{ github.sha }}
 
-  k8s-deploy-validation:
-    name: 3. Validate & Deploy Kubernetes Manifests
+  k8s-deploy-cloud:
+    name: 3. Deploy to AWS EC2 K3s Cluster
     needs: docker-build-push
     runs-on: ubuntu-latest
 
@@ -61,9 +61,13 @@ jobs:
     - name: Checkout Source Code
       uses: actions/checkout@v4
 
-    - name: Set up kubectl
-      uses: azure/setup-kubectl@v3
-
-    - name: Validate Kubernetes Manifests
+    - name: Set up Kubeconfig
       run: |
-        kubectl apply --dry-run=client -f k8s/
+        mkdir -p ~/.kube
+        echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+        chmod 600 ~/.kube/config
+
+    - name: Deploy Manifests to K3s Cluster
+      run: |
+        kubectl apply -f k8s/
+        kubectl rollout status deployment/java-app-deployment --timeout=120s
