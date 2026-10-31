@@ -48,7 +48,7 @@ public class App {
                     </head>
                     <body>
                         <div class="card">
-                            <h1>Hello, CI/CD Pipeline!</h1>
+                            <h1>Hello, Cloud CI/CD Pipeline!</h1>
                             <p>Your Java application is running on Kubernetes.</p>
                             <p>Maven + Docker + Kubernetes on AWS EC2</p>
                         </div>
